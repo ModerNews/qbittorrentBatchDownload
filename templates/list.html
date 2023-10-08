@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nyaa.si batch downloader</title>
+    <style>
+        body {
+            background-color: #101418;
+            color: #FAFEFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+        }
+
+        h4 {
+            font-family: inherit;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        hr {
+            width: 90%;
+            height: 2%;
+            color: transparent;
+        }
+
+        .list {
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .list-entry {
+            font-family: inherit;
+            /*height: 80px;*/
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgb(21, 31, 46);
+            border-radius: 10px;
+        }
+
+        .list-entry-description{
+            padding: 10px 0 10px 0;
+            margin: 0;
+            font-weight: inherit;
+        }
+
+        .list-entry-description p {
+            margin: 5px 0 5px 0;
+            font-weight: 500;
+        }
+
+        .list-icon {
+            margin: 0vw 1.5vw 0vw 1.5vw;
+            justify-self: flex-end;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            color: #FAFEFF;
+        }
+
+        .list-icon a {
+            font-family: inherit;
+            font-size: 0.8rem;
+            text-align: center;
+            text-decoration: none;
+            color: rgb(61, 180, 242);
+        }
+
+        .list-icon a:hover {
+            color: rgb(13, 145, 217);
+        }
+
+        .search-bar {
+            font-family: inherit;
+            width: 60%;
+            height: 50px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            color: rgb(159, 173, 189);
+            background-color: rgb(21, 31, 46);
+            border-radius: 10px;
+        }
+
+        .search-bar span {
+            border-radius: 0;
+            color: inherit;
+            margin: 1.6%;
+            margin-right: 0;
+        }
+
+        .search-bar input {
+            font-family: inherit;
+            border: none;
+            width: 50vw;
+            background-color: inherit;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: inherit;
+            margin: 0px 0px 0px 1%;
+        }
+
+        .search-bar select {
+            font-family: inherit;
+            border: none;
+            width: 10vw;
+            background-color: inherit;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: inherit;
+            margin: 0px 0px 0px 1%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .search-bar input:focus {
+            color: #FAFEFF;
+            outline: none;
+        }
+
+        .list-entry-head {
+            display: flex;
+            flex-direction: inherit;
+        }
+
+        .list-entry-shortcuts {
+            display: flex;
+            flex-direction: inherit;
+            align-items: center;
+            height: 100%;
+        }
+
+        .list-submit {
+            align-self: flex-end;
+            font: inherit;
+            color: #FAFEFF;
+            background-color: rgb(61, 180, 242);
+            outline: none;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 60px 10px 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .list-submit:hover {
+            color: #FAFEFF;
+            background-color: rgb(13, 145, 217);
+        }
+
+        .list-download {
+            align-self: flex-end;
+        }
+
+        .list-savepath {
+            width: 15vw;
+            font: inherit;
+            color: #FAFEFF;
+            background-color: rgb(21, 31, 46);
+            outline: none;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 10px 10px 0px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: right;
+        }
+
+    </style>
+</head>
+<body>
+    <form class="search-bar" action="/list" method="GET">
+        <span class="input-group-text">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"></path>
+                  </svg>
+        </span>
+        <input type="text" placeholder="Search nyaa.si" name="q">
+        <select name="team">
+            <option value="[SubsPlease]">SubsPlease</option>
+            <option value="[Erai-raws]">Erai-raws</option>
+            <option value="[EMBER]">Ember</option>
+            <option value="[Judas]">Judas</option>
+            <option value="">Other</option>
+        </select>
+    </form>
+    <hr>
+    <form class="list" action="/list" method="POST">
+        {% for entry in nyaa %}
+        <div class="list-entry">
+            <div class="list-entry-head">
+                <input class="list-icon" type="checkbox" name="entry_{{ loop.index }}" value="{{ entry.torrent_link }}" checked>
+                <div class="list-entry-description">
+                    <h4>{{ entry.title }}</h4>
+                    <p>Uploaded at: {{ entry.upload_date }}</p>
+                </div>
+            </div>
+            <div class="list-entry-shortcuts">
+                <div class="download list-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                      <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                      <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                    </svg>
+                    <a href="{{ entry.torrent_link }}">Download<br/>Torrent</a>
+                </div>
+                <div class="jump list-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                      <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                    </svg>
+                    <a href="{{ entry.upstream_link }}">Nyaa.si</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+        <div class="list-download">
+            <input type="text" class="list-savepath" name="savepath" value="{{ nyaa[-1].simplified_title }}">
+            <input class="list-submit" type="submit" value="Download">
+        </div>
+    </form>
+</body>
+</html>
